@@ -167,11 +167,15 @@
     </div>
 
     <script>
-        // GANTI INI DENGAN DATA DARI SUPABASE ANDA
         const SUPABASE_URL = "https://vbqjzehcjibawxxruuzf.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_y3vnG_U9nEH9fGUVXC2TOQ_wMTGog3P";
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Menggunakan variabel global jendela agar tidak bentrok dengan modul library
+        window.db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function abseningApp() {
+            // alias penyesuaian fungsi modal internal
+        }
 
         function absensiApp() {
             return {
@@ -184,8 +188,7 @@
                 async initApp() {
                     await this.fetchData();
                     
-                    // Fitur Real-time: Otomatis reload data jika ada perubahan di database
-                    supabase.channel('custom-all-channel')
+                    window.db.channel('custom-all-channel')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'log_absensi' }, () => {
                         this.fetchData();
                     })
@@ -193,7 +196,7 @@
                 },
 
                 async fetchData() {
-                    let query = supabase.from('log_absensi').select('*').order('id', { ascending: false });
+                    let query = window.db.from('log_absensi').select('*').order('id', { ascending: false });
                     
                     if (this.filterStatus !== 'Semua') {
                         query = query.eq('status', this.filterStatus);
@@ -207,7 +210,7 @@
                 },
 
                 async tambahLog() {
-                    const { error } = await supabase.from('log_absensi').insert([
+                    const { error } = await window.db.from('log_absensi').insert([
                         { nama_karyawan: this.form.nama, alasan: this.form.alasan }
                     ]);
 
@@ -221,10 +224,9 @@
                 async checkIn(id, waktuKeluar) {
                     const waktuMasuk = new Date();
                     const keluar = new Date(waktuKeluar);
-                    // Hitung durasi pembulatan ke menit terdekat
                     const durasiMenit = Math.round((waktuMasuk - keluar) / 60000);
 
-                    await supabase.from('log_absensi').update({
+                    await window.db.from('log_absensi').update({
                         waktu_masuk: waktuMasuk.toISOString(),
                         status: 'Sudah Kembali',
                         durasi: durasiMenit
@@ -232,8 +234,7 @@
                 },
 
                 async hitungMetrics() {
-                    // Ambil ulang semua data tanpa filter khusus untuk kalkulasi metrik ringkasan
-                    const { data } = await supabase.from('log_absensi').select('*');
+                    const { data } = await window.db.from('log_absensi').select('*');
                     if (!data) return;
 
                     this.metrics.total = data.length;
