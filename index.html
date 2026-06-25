@@ -80,8 +80,7 @@
                             <button @click="resetWaktu()" class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-4 py-2.5 rounded-lg font-medium transition flex items-center gap-2 cursor-pointer">🔄 Reset Filter Waktu</button>
                         </div>
                     </div>
-                    
-                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
@@ -96,9 +95,18 @@
                         <p class="text-sm text-gray-400 font-medium text-amber-400">Sedang Keluar</p>
                         <p class="text-3xl font-bold mt-2 text-amber-400" x-text="metrics.keluar"></p>
                     </div>
-                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <p class="text-sm text-gray-400 font-medium text-blue-400">Rata-rata Durasi</p>
-                        <p class="text-3xl font-bold mt-2 text-blue-400" x-text="metrics.rataDurasi + 'm'"></p>
+                    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs text-blue-400 font-semibold uppercase tracking-wider">Durasi Keluar</p>
+                            <div class="flex justify-between items-baseline mt-2">
+                                <span class="text-gray-400 text-xs">Total:</span>
+                                <span class="text-2xl font-bold text-blue-400" x-text="metrics.totalDurasi + ' m'"></span>
+                            </div>
+                            <div class="flex justify-between items-baseline border-t border-gray-700/50 mt-1 pt-1">
+                                <span class="text-gray-400 text-xs">Rata-rata:</span>
+                                <span class="text-base font-semibold text-blue-300" x-text="metrics.rataDurasi + ' m'"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -161,7 +169,7 @@
                 <div class="flex justify-between items-center mb-8">
                     <div>
                         <h1 class="text-2xl font-bold">Daftar Manajemen Staff</h1>
-                        <p class="text-sm text-gray-400">Kelola pengelompokan shift kerja karyawan (Klik nama untuk lihat rincian log keluar)</p>
+                        <p class="text-sm text-gray-400">Kelola pengelompokan shift kerja karyawan</p>
                     </div>
                     <button @click="bukaModalStaff = true" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 shadow-lg cursor-pointer">
                         👤 Tambah Staff Baru
@@ -177,27 +185,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <template x-for="s in staffTerfilter()" :key="s.id">
                         <div class="bg-gray-800 border border-gray-700 p-5 rounded-xl flex items-center justify-between group hover:border-emerald-500/50 transition">
-                            <div @click="lihatRincianStaff(s.nama_staff)" class="flex items-center gap-4 flex-1 cursor-pointer" title="Klik untuk lihat rincian log keluar">
+                            <div @click="lihatRincianStaff(s.nama_staff)" class="flex items-center gap-4 flex-1 cursor-pointer">
                                 <div class="w-12 h-12 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 flex items-center justify-center text-lg font-bold text-emerald-400 transition" x-text="s.nama_staff.charAt(0).toUpperCase()"></div>
                                 <div>
                                     <h4 class="font-bold text-base group-hover:text-emerald-400 transition" x-text="s.nama_staff"></h4>
-                                    <p class="text-xs text-gray-400 mt-0.5 flex items-center gap-1">📋 Lihat Rincian Log</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">📋 Lihat Rincian Log</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span :class="s.shift === 'Pagi' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'" class="px-3 py-1 rounded-full text-xs font-semibold" x-text="s.shift === 'Pagi' ? '☀️ Pagi' : '🌙 Malam'"></span>
-                                <button @click="hapusStaff(s.id, s.nama_staff)" class="text-gray-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-700/50 transition cursor-pointer" title="Hapus Staff">
-                                    🗑️
-                                </button>
+                                <button @click="hapusStaff(s.id, s.nama_staff)" class="text-gray-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-gray-700/50 transition cursor-pointer">🗑️</button>
                             </div>
                         </div>
                     </template>
                 </div>
-                <div x-show="staffTerfilter().length === 0" class="text-center py-12 text-gray-500">
-                    Tidak ada staff pada kategori shift ini.
-                </div>
             </div>
-
         </main>
     </div>
 
@@ -210,8 +212,7 @@
             <form @submit.prevent="tambahLog()">
                 <div class="p-6 space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-2">Pilih Nama Karyawan</label>
-                        <select x-model="formLog.nama" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+                        <select x-model="formLog.nama" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
                             <option value="">-- Pilih Staff --</option>
                             <template x-for="s in staffList" :key="s.id">
                                 <option :value="s.nama_staff" x-text="s.nama_staff"></option>
@@ -219,8 +220,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-2">Alasan Keluar</label>
-                        <select x-model="formLog.alasan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+                        <select x-model="formLog.alasan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
                             <option value="Rokok">Rokok</option>
                             <option value="Toilet">Toilet</option>
                             <option value="Lainnya">Lainnya</option>
@@ -229,7 +229,7 @@
                 </div>
                 <div class="p-6 bg-gray-750 border-t border-gray-700 flex justify-end gap-3">
                     <button type="button" @click="bukaModalLog = false" class="text-gray-400 cursor-pointer">Batal</button>
-                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Simpan & Keluar</button>
+                    <button type="submit" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Simpan</button>
                 </div>
             </form>
         </div>
@@ -243,21 +243,15 @@
             </div>
             <form @submit.prevent="tambahStaff()">
                 <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-2">Nama Lengkap Karyawan</label>
-                        <input type="text" x-model="formStaff.nama" required placeholder="Contoh: Budi Santoso" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-2">Shift Kerja</label>
-                        <select x-model="formStaff.shift" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500">
-                            <option value="Pagi">☀️ Shift Pagi</option>
-                            <option value="Malam">🌙 Shift Malam</option>
-                        </select>
-                    </div>
+                    <input type="text" x-model="formStaff.nama" required placeholder="Nama Karyawan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
+                    <select x-model="formStaff.shift" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
+                        <option value="Pagi">☀️ Shift Pagi</option>
+                        <option value="Malam">🌙 Shift Malam</option>
+                    </select>
                 </div>
                 <div class="p-6 bg-gray-750 border-t border-gray-700 flex justify-end gap-3">
                     <button type="button" @click="bukaModalStaff = false" class="text-gray-400 cursor-pointer">Batal</button>
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Tambahkan Staff</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Tambahkan</button>
                 </div>
             </form>
         </div>
@@ -275,10 +269,9 @@
                 filterShift: 'Semua',
                 filterStatus: 'Semua',
                 pencarianNama: '',
-                
                 filterTanggal: '',
                 aktifShiftPreset: '', 
-                shiftSekarang: 'Menghitung...', // State dinamis untuk bagian hijau
+                shiftSekarang: 'Menghitung...',
 
                 logs: [],
                 staffList: [],
@@ -286,14 +279,14 @@
                 bukaModalStaff: false,
                 formLog: { nama: '', alasan: 'Rokok' },
                 formStaff: { nama: '', shift: 'Pagi' },
-                metrics: { total: 0, kembali: 0, keluar: 0, rataDurasi: 0 },
+                
+                // Tambahkan totalDurasi di dalam objek metrics
+                metrics: { total: 0, kembali: 0, keluar: 0, totalDurasi: 0, rataDurasi: 0 },
                 pinAkses: '8888', 
 
                 async initApp() {
                     this.updateShiftSekarang();
-                    // Jalankan pengecekan jam setiap 1 menit agar shift berjalan terus terupdate otomatis
                     setInterval(() => this.updateShiftSekarang(), 60000);
-
                     await this.fetchLogData();
                     await this.fetchStaffData();
                     
@@ -303,17 +296,10 @@
                     .subscribe();
                 },
 
-                // LOGIKA HITUNG SHIFT BERJALAN SAAT INI (BAGIAN HIJAU)
                 updateShiftSekarang() {
                     const sekarang = new Date();
-                    const jam = sekarang.getHours();
-                    const menit = sekarang.getMinutes();
-                    const totalMenit = (jam * 60) + menit;
-
-                    const batasMulaiPagi = (6 * 60) + 30;  // 06:30 dalam menit
-                    const batasMulaiMalam = (18 * 60) + 30; // 18:30 dalam menit
-
-                    if (totalMenit >= batasMulaiPagi && totalMenit < batasMulaiMalam) {
+                    const totalMenit = (sekarang.getHours() * 60) + sekarang.getMinutes();
+                    if (totalMenit >= 390 && totalMenit < 1110) {
                         this.shiftSekarang = "☀️ Pagi";
                     } else {
                         this.shiftSekarang = "🌙 Malam";
@@ -327,147 +313,87 @@
                     
                     if (this.filterTanggal) {
                         let startISO, endISO;
-                        
                         if (this.aktifShiftPreset === 'Pagi') {
                             startISO = `${this.filterTanggal}T06:30:00`;
                             endISO = `${this.filterTanggal}T18:30:00`;
-                        } 
-                        else if (this.aktifShiftPreset === 'Malam') {
+                        } else if (this.aktifShiftPreset === 'Malam') {
                             startISO = `${this.filterTanggal}T18:30:00`;
-                            
                             let tglEsok = new Date(this.filterTanggal);
                             tglEsok.setDate(tglEsok.getDate() + 1);
-                            let formatTglEsok = tglEsok.toISOString().split('T')[0];
-                            
-                            endISO = `${formatTglEsok}T06:30:00`;
-                        } 
-                        else {
+                            startISO = `${this.filterTanggal}T18:30:00`;
+                            endISO = `${tglEsok.toISOString().split('T')[0]}T06:30:00`;
+                        } else {
                             startISO = `${this.filterTanggal}T00:00:00`;
                             endISO = `${this.filterTanggal}T23:59:59`;
                         }
-                        
                         q = q.gte('waktu_keluar', startISO).lte('waktu_keluar', endISO);
                     }
-                    
                     const { data } = await q;
                     if (data) { this.logs = data; this.hitungMetrics(); }
                 },
 
                 setPresetShift(shift) {
-                    if (!this.filterTanggal) {
-                        this.filterTanggal = new Date().toISOString().split('T')[0];
-                    }
+                    if (!this.filterTanggal) this.filterTanggal = new Date().toISOString().split('T')[0];
                     this.aktifShiftPreset = shift;
                     this.fetchLogData();
                 },
 
-                resetWaktu() {
-                    this.filterTanggal = '';
-                    this.aktifShiftPreset = '';
-                    this.fetchLogData();
-                },
-
+                resetWaktu() { this.filterTanggal = ''; this.aktifShiftPreset = ''; this.fetchLogData(); },
                 async fetchStaffData() {
                     const { data } = await window.db.from('data_staff').select('*').order('nama_staff', { ascending: true });
                     if (data) this.staffList = data;
                 },
-
                 staffTerfilter() {
                     if (this.filterShift === 'Semua') return this.staffList;
                     return this.staffList.filter(s => s.shift === this.filterShift);
                 },
-
-                lihatRincianStaff(nama) {
-                    this.pencarianNama = nama;
-                    this.menuAktif = 'dashboard';
-                    this.fetchLogData();
-                },
-
-                resetFilterDanBukaDashboard() {
-                    this.pencarianNama = '';
-                    this.filterStatus = 'Semua';
-                    this.filterTanggal = '';
-                    this.aktifShiftPreset = '';
-                    this.menuAktif = 'dashboard';
-                    this.fetchLogData();
-                },
+                lihatRincianStaff(nama) { this.pencarianNama = nama; this.menuAktif = 'dashboard'; this.fetchLogData(); },
+                resetFilterDanBukaDashboard() { this.pencarianNama = ''; this.filterStatus = 'Semua'; this.filterTanggal = ''; this.aktifShiftPreset = ''; this.menuAktif = 'dashboard'; this.fetchLogData(); },
 
                 downloadExcel() {
-                    if(this.logs.length === 0) return alert('Tidak ada data log untuk diunduh!');
-                    
+                    if(this.logs.length === 0) return alert('Tidak ada data log!');
                     let csvContent = "Tanggal Keluar;Nama Staff;Alasan;Status;Durasi (Menit);Jam Keluar;Jam Masuk\n";
-                    
                     this.logs.forEach(log => {
-                        let tanggal = this.formatTanggal(log.waktu_keluar);
-                        let nama = log.nama_karyawan;
-                        let alasan = log.alasan;
-                        let status = log.status;
-                        let durasi = log.durasi || 0;
-                        let keluar = this.formatJam(log.waktu_keluar);
-                        let masuk = log.waktu_masuk ? this.formatJam(log.waktu_masuk) : "-";
-                        
-                        csvContent += `${tanggal};${nama};${alasan};${status};${durasi};${keluar};${masuk}\n`;
+                        csvContent += `${this.formatTanggal(log.waktu_keluar)};${log.nama_karyawan};${log.alasan};${log.status};${log.durasi || 0};${this.formatJam(log.waktu_keluar)};${log.waktu_masuk ? this.formatJam(log.waktu_masuk) : "-"}\n`;
                     });
-                    
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
                     link.setAttribute("href", url);
-                    
-                    let tglInfo = this.filterTanggal ? `_${this.filterTanggal}` : '';
-                    let shiftInfo = this.aktifShiftPreset ? `_Shift_${this.aktifShiftPreset}` : '';
-                    let namaFile = this.pencarianNama ? `Log_${this.pencarianNama.replace(/\s+/g, '_')}${tglInfo}${shiftInfo}.csv` : `Log_Staff${tglInfo}${shiftInfo}.csv`;
-                    
-                    link.setAttribute("download", namaFile);
-                    document.body.appendChild(link);
+                    link.setAttribute("download", `Log_Staff_${this.filterTanggal || 'Semua'}.csv`);
                     link.click();
-                    document.body.removeChild(link);
                 },
 
                 async tambahLog() {
-                    if(!this.formLog.nama) return alert('Pilih nama staff terlebih dahulu!');
-                    const { error } = await window.db.from('log_absensi').insert([
-                        { nama_karyawan: this.formLog.nama, alasan: this.formLog.alasan }
-                    ]);
-                    if (!error) { this.formLog.nama = ''; this.bukaModalLog = false; }
+                    if(!this.formLog.nama) return;
+                    await window.db.from('log_absensi').insert([{ nama_karyawan: this.formLog.nama, alasan: this.formLog.alasan }]);
+                    this.formLog.nama = ''; this.bukaModalLog = false;
                 },
-
                 async tambahStaff() {
-                    const { error } = await window.db.from('data_staff').insert([
-                        { nama_staff: this.formStaff.nama, shift: this.formStaff.shift }
-                    ]);
-                    if (!error) { this.formStaff.nama = ''; this.bukaModalStaff = false; }
+                    await window.db.from('data_staff').insert([{ nama_staff: this.formStaff.nama, shift: this.formStaff.shift }]);
+                    this.formStaff.nama = ''; this.bukaModalStaff = false;
                 },
-
                 async hapusStaff(id, nama) {
-                    const konfirmasi = confirm(`Apakah Anda yakin ingin menghapus staff "${nama}"?`);
-                    if (!konfirmasi) return;
-                    const inputPin = prompt("Masukkan PIN Akses Khusus untuk menghapus staff:");
-                    if (inputPin === null) return;
-                    if (inputPin !== this.pinAkses) {
-                        alert("❌ PIN SALAH! Anda tidak memiliki akses untuk menghapus data ini.");
-                        return;
-                    }
-                    const { error } = await window.db.from('data_staff').delete().eq('id', id);
-                    if (!error) alert(`✅ Staff "${nama}" berhasil dihapus.`);
+                    if (!confirm(`Hapus staff "${nama}"?`) || prompt("Masukkan PIN:") !== this.pinAkses) return;
+                    await window.db.from('data_staff').delete().eq('id', id);
                 },
-
                 async checkIn(id, waktuKeluar) {
                     const waktuMasuk = new Date();
                     const durasi = Math.round((waktuMasuk - new Date(waktuKeluar)) / 60000);
-                    await window.db.from('log_absensi').update({
-                        waktu_masuk: waktuMasuk.toISOString(),
-                        status: 'Sudah Kembali',
-                        durasi: durasi
-                    }).eq('id', id);
+                    await window.db.from('log_absensi').update({ waktu_masuk: waktuMasuk.toISOString(), status: 'Sudah Kembali', durasi: durasi }).eq('id', id);
                 },
 
+                // LOGIKA HITUNG METRICS TOTAL DAN RATA-RATA DURASI
                 hitungMetrics() {
                     this.metrics.total = this.logs.length;
                     this.metrics.kembali = this.logs.filter(l => l.status === 'Sudah Kembali').length;
                     this.metrics.keluar = this.logs.filter(l => l.status === 'Sedang Keluar').length;
+                    
                     const kembali = this.logs.filter(l => l.status === 'Sudah Kembali');
-                    this.metrics.rataDurasi = kembali.length ? Math.round(kembali.reduce((s, l) => s + (l.durasi || 0), 0) / kembali.length) : 0;
+                    // Hitung total akumulasi menit
+                    this.metrics.totalDurasi = kembali.reduce((s, l) => s + (l.durasi || 0), 0);
+                    // Hitung rata-rata
+                    this.metrics.rataDurasi = kembali.length ? Math.round(this.metrics.totalDurasi / kembali.length) : 0;
                 },
 
                 formatTanggal(iso) { return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); },
