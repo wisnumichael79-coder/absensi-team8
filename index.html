@@ -47,7 +47,7 @@
         <main class="flex-1 overflow-y-auto p-8">
             
             <div x-show="menuAktif === 'dashboard'">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex justify-between items-center mb-6">
                     <div>
                         <h1 class="text-2xl font-bold">Log Absensi Real-Time</h1>
                         <p class="text-sm text-gray-400" x-show="!pencarianNama">Pantau aktivitas keluar-masuk karyawan</p>
@@ -63,6 +63,30 @@
                         <button @click="bukaModalLog = true" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer">
                             ➕ Tambah Entri Log
                         </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-8 flex flex-col gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Pilih Tanggal Acuan</label>
+                            <input type="date" x-model="filterTanggal" @change="fetchLogData()" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button @click="setPresetShift('Pagi')" :class="aktifShiftPreset === 'Pagi' ? 'bg-amber-500 text-gray-900 font-bold' : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20'" class="flex-1 text-xs py-2.5 rounded-lg font-medium transition cursor-pointer">☀️ Shift Pagi (06:30 - 18:30)</button>
+                            <button @click="setPresetShift('Malam')" :class="aktifShiftPreset === 'Malam' ? 'bg-indigo-500 text-white font-bold' : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/20'" class="flex-1 text-xs py-2.5 rounded-lg font-medium transition cursor-pointer">🌙 Shift Malam (18:30 - Esok 06:30)</button>
+                        </div>
+                        <div class="flex items-end justify-end">
+                            <button @click="resetWaktu()" class="bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs px-4 py-2.5 rounded-lg font-medium transition flex items-center gap-2 cursor-pointer">🔄 Reset Filter Waktu</button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-400 bg-gray-900/50 p-2.5 rounded-lg border border-gray-700 font-mono flex justify-between items-center">
+                        <div>
+                            <span>Rentang Filter Aktif: </span>
+                            <span class="text-emerald-400 font-bold" x-text="infoRentangWaktu"></span>
+                        </div>
+                        <span class="text-gray-500 text-[10px] uppercase" x-text="aktifShiftPreset ? 'Preset: Shift ' + aktifShiftPreset : 'Kustom / Tanpa Filter'"></span>
                     </div>
                 </div>
 
@@ -90,7 +114,6 @@
                         <h3 class="font-bold text-lg">Riwayat Keluar</h3>
                         <div class="flex gap-3">
                             <input type="text" x-model="pencarianNama" @input.debounce.300ms="fetchLogData()" placeholder="Cari nama staff..." class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500">
-                            
                             <select x-model="filterStatus" @change="fetchLogData()" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none">
                                 <option value="Semua">Semua Status</option>
                                 <option value="Sudah Kembali">Sudah Kembali</option>
@@ -102,20 +125,20 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-gray-700/30 text-gray-400 text-xs font-semibold uppercase border-b border-gray-700">
-                                    <th class="p-4">Tanggal</th>
+                                    <th class="p-4">Tanggal Keluar</th>
                                     <th class="p-4">Nama Staff</th>
                                     <th class="p-4">Alasan</th>
                                     <th class="p-4">Status</th>
                                     <th class="p-4">Durasi</th>
-                                    <th class="p-4">Keluar</th>
-                                    <th class="p-4">Masuk</th>
+                                    <th class="p-4">Jam Keluar</th>
+                                    <th class="p-4">Jam Masuk</th>
                                     <th class="p-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-700 text-sm">
                                 <template x-for="log in logs" :key="log.id">
                                     <tr class="hover:bg-gray-700/20">
-                                        <td class="p-4 text-gray-400" x-text="formatTanggal(log.waktu_keluar)"></td>
+                                        <td class="p-4 text-gray-400" x-text="formatTanggal(log.waktu_keluar)"></td >
                                         <td class="p-4 font-semibold" x-text="log.nama_karyawan"></td>
                                         <td class="p-4">
                                             <span class="px-2 py-0.5 rounded text-xs font-medium" :class="log.alasan === 'Rokok' ? 'bg-red-500/10 text-red-400' : log.alasan === 'Toilet' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400'" x-text="log.alasan"></span>
@@ -133,7 +156,7 @@
                                     </tr>
                                 </template>
                                 <tr x-show="logs.length === 0">
-                                    <td colspan="8" class="p-8 text-center text-gray-500">Belum ada data log aktivitas.</td>
+                                    <td colspan="8" class="p-8 text-center text-gray-500">Tidak ada data log aktivitas pada rentang shift ini.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -258,7 +281,13 @@
                 menuAktif: 'dashboard',
                 filterShift: 'Semua',
                 filterStatus: 'Semua',
-                pencarianNama: '', // State pencarian nama baru
+                pencarianNama: '',
+                
+                // State filter rentang waktu
+                filterTanggal: '',
+                aktifShiftPreset: '', // Menyimpan status preset aktif ('Pagi' atau 'Malam')
+                infoRentangWaktu: 'Menampilkan Semua Data (Tanpa Batasan)',
+
                 logs: [],
                 staffList: [],
                 bukaModalLog: false,
@@ -281,14 +310,58 @@
                 async fetchLogData() {
                     let q = window.db.from('log_absensi').select('*').order('id', { ascending: false });
                     if (this.filterStatus !== 'Semua') q = q.eq('status', this.filterStatus);
+                    if (this.pencarianNama.trim() !== '') q = q.ilike('nama_karyawan', `%${this.pencarianNama}%`);
                     
-                    // Filter pencarian nama secara dinamis (Supabase query)
-                    if (this.pencarianNama.trim() !== '') {
-                        q = q.ilike('nama_karyawan', `%${this.pencarianNama}%`);
+                    // Logika Filter Rentang Waktu & Deteksi Cross-Day (Shift Malam)
+                    if (this.filterTanggal) {
+                        let startISO, endISO;
+                        
+                        if (this.aktifShiftPreset === 'Pagi') {
+                            // Pagi: Hari H jam 06:30 sampai Hari H jam 18:30
+                            startISO = `${this.filterTanggal}T06:30:00`;
+                            endISO = `${this.filterTanggal}T18:30:00`;
+                            this.infoRentangWaktu = `${this.formatTanggal(startISO)} [06:30] s/d [18:30]`;
+                        } 
+                        else if (this.aktifShiftPreset === 'Malam') {
+                            // Malam: Hari H jam 18:30 sampai Hari H+1 jam 06:30
+                            startISO = `${this.filterTanggal}T18:30:00`;
+                            
+                            let tglEsok = new Date(this.filterTanggal);
+                            tglEsok.setDate(tglEsok.getDate() + 1);
+                            let formatTglEsok = tglEsok.toISOString().split('T')[0];
+                            
+                            endISO = `${formatTglEsok}T06:30:00`;
+                            this.infoRentangWaktu = `${this.formatTanggal(startISO)} [18:30] s/d Esok Hari ${this.formatTanggal(endISO)} [06:30]`;
+                        } 
+                        else {
+                            // Default jika hanya memilih tanggal tanpa klik preset shift (Full 24 Jam)
+                            startISO = `${this.filterTanggal}T00:00:00`;
+                            endISO = `${this.filterTanggal}T23:59:59`;
+                            this.infoRentangWaktu = `${this.formatTanggal(startISO)} (Full 24 Jam)`;
+                        }
+                        
+                        q = q.gte('waktu_keluar', startISO).lte('waktu_keluar', endISO);
+                    } else {
+                        this.infoRentangWaktu = 'Menampilkan Semua Data (Tanpa Batasan)';
                     }
                     
                     const { data } = await q;
                     if (data) { this.logs = data; this.hitungMetrics(); }
+                },
+
+                setPresetShift(shift) {
+                    // Jika belum pilih tanggal acuan, setel otomatis ke hari ini
+                    if (!this.filterTanggal) {
+                        this.filterTanggal = new Date().toISOString().split('T')[0];
+                    }
+                    this.aktifShiftPreset = shift;
+                    this.fetchLogData();
+                },
+
+                resetWaktu() {
+                    this.filterTanggal = '';
+                    this.aktifShiftPreset = '';
+                    this.fetchLogData();
                 },
 
                 async fetchStaffData() {
@@ -301,7 +374,6 @@
                     return this.staffList.filter(s => s.shift === this.filterShift);
                 },
 
-                // FUNGSI UNTUK PINDAH KE LOG JIKA KLIK KARTU STAFF
                 lihatRincianStaff(nama) {
                     this.pencarianNama = nama;
                     this.menuAktif = 'dashboard';
@@ -311,16 +383,17 @@
                 resetFilterDanBukaDashboard() {
                     this.pencarianNama = '';
                     this.filterStatus = 'Semua';
+                    this.filterTanggal = '';
+                    this.aktifShiftPreset = '';
                     this.menuAktif = 'dashboard';
                     this.fetchLogData();
                 },
 
-                // FUNGSI EXPULSI EXCEL (.CSV Semicolon Delimited)
                 downloadExcel() {
                     if(this.logs.length === 0) return alert('Tidak ada data log untuk diunduh!');
                     
-                    // Header Kolom dengan pembatas Semicolon (Indonesian excel friendly)
-                    let csvContent = "Tanggal;Nama Staff;Alasan;Status;Durasi (Menit);Jam Keluar;Jam Masuk\n";
+                    // Format terstruktur semi-colon khusus untuk regional Indonesia
+                    let csvContent = "Tanggal Keluar;Nama Staff;Alasan;Status;Durasi (Menit);Jam Keluar;Jam Masuk\n";
                     
                     this.logs.forEach(log => {
                         let tanggal = this.formatTanggal(log.waktu_keluar);
@@ -334,16 +407,16 @@
                         csvContent += `${tanggal};${nama};${alasan};${status};${durasi};${keluar};${masuk}\n`;
                     });
                     
-                    // Generate berkas download browser
                     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
                     link.setAttribute("href", url);
                     
-                    // Penamaan file dinamis berdasarkan rincian pencarian
-                    let namaFile = this.pencarianNama ? `Log_Keluar_${this.pencarianNama.replace(/\s+/g, '_')}.csv` : "Semua_Log_Keluar_Staff.csv";
-                    link.setAttribute("download", namaFile);
+                    let tglInfo = this.filterTanggal ? `_${this.filterTanggal}` : '';
+                    let shiftInfo = this.aktifShiftPreset ? `_Shift_${this.aktifShiftPreset}` : '';
+                    let namaFile = this.pencarianNama ? `Log_${this.pencarianNama.replace(/\s+/g, '_')}${tglInfo}${shiftInfo}.csv` : `Log_Staff${tglInfo}${shiftInfo}.csv`;
                     
+                    link.setAttribute("download", namaFile);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -351,7 +424,7 @@
 
                 async tambahLog() {
                     if(!this.formLog.nama) return alert('Pilih nama staff terlebih dahulu!');
-                    const { error } = await window.db.from('log_absensi').insert([
+                    const { error } = await window.db.from('log_absending').insert([
                         { nama_karyawan: this.formLog.nama, alasan: this.formLog.alasan }
                     ]);
                     if (!error) { this.formLog.nama = ''; this.bukaModalLog = false; }
