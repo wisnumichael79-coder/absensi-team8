@@ -204,30 +204,26 @@
     </div>
 
     <div x-show="bukaModalLog" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-800 border border-gray-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl max-w-md w-full shadow-2xl">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
                 <h3 class="text-lg font-bold">Tambah Entri Log Keluar</h3>
                 <button @click="bukaModalLog = false" class="text-gray-400 hover:text-white text-xl cursor-pointer">&times;</button>
             </div>
             <form @submit.prevent="tambahLog()">
                 <div class="p-6 space-y-4">
-                    <div>
-                        <select x-model="formLog.nama" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
-                            <option value="">-- Pilih Staff --</option>
-                            <template x-for="s in staffList" :key="s.id">
-                                <option :value="s.nama_staff" x-text="s.nama_staff"></option>
-                            </template>
-                        </select>
-                    </div>
-                    <div>
-                        <select x-model="formLog.alasan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
-                            <option value="Rokok">Rokok</option>
-                            <option value="Toilet">Toilet</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
+                    <select x-model="formLog.nama" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white">
+                        <option value="">-- Pilih Staff --</option>
+                        <template x-for="s in staffList" :key="s.id">
+                            <option :value="s.nama_staff" x-text="s.nama_staff"></option>
+                        </template>
+                    </select>
+                    <select x-model="formLog.alasan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white">
+                        <option value="Rokok">Rokok</option>
+                        <option value="Toilet">Toilet</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
                 </div>
-                <div class="p-6 bg-gray-750 border-t border-gray-700 flex justify-end gap-3">
+                <div class="p-6 border-t border-gray-700 flex justify-end gap-3">
                     <button type="button" @click="bukaModalLog = false" class="text-gray-400 cursor-pointer">Batal</button>
                     <button type="submit" class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Simpan</button>
                 </div>
@@ -236,20 +232,20 @@
     </div>
 
     <div x-show="bukaModalStaff" x-cloak class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-800 border border-gray-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl max-w-md w-full shadow-2xl">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
                 <h3 class="text-lg font-bold">Daftarkan Staff Baru</h3>
                 <button @click="bukaModalStaff = false" class="text-gray-400 hover:text-white text-xl cursor-pointer">&times;</button>
             </div>
             <form @submit.prevent="tambahStaff()">
                 <div class="p-6 space-y-4">
-                    <input type="text" x-model="formStaff.nama" required placeholder="Nama Karyawan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
-                    <select x-model="formStaff.shift" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none">
+                    <input type="text" x-model="formStaff.nama" required placeholder="Nama Karyawan" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white">
+                    <select x-model="formStaff.shift" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2.5 text-white">
                         <option value="Pagi">☀️ Shift Pagi</option>
                         <option value="Malam">🌙 Shift Malam</option>
                     </select>
                 </div>
-                <div class="p-6 bg-gray-750 border-t border-gray-700 flex justify-end gap-3">
+                <div class="p-6 border-t border-gray-700 flex justify-end gap-3">
                     <button type="button" @click="bukaModalStaff = false" class="text-gray-400 cursor-pointer">Batal</button>
                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-pointer">Tambahkan</button>
                 </div>
@@ -260,7 +256,6 @@
     <script>
         const SUPABASE_URL = "https://vbqjzehcjibawxxruuzf.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_y3vnG_U9nEH9fGUVXC2TOQ_wMTGog3P";
-        
         window.db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function absensiApp() {
@@ -272,15 +267,12 @@
                 filterTanggal: '',
                 aktifShiftPreset: '', 
                 shiftSekarang: 'Menghitung...',
-
                 logs: [],
                 staffList: [],
                 bukaModalLog: false,
                 bukaModalStaff: false,
                 formLog: { nama: '', alasan: 'Rokok' },
                 formStaff: { nama: '', shift: 'Pagi' },
-                
-                // Tambahkan totalDurasi di dalam objek metrics
                 metrics: { total: 0, kembali: 0, keluar: 0, totalDurasi: 0, rataDurasi: 0 },
                 pinAkses: '8888', 
 
@@ -289,7 +281,6 @@
                     setInterval(() => this.updateShiftSekarang(), 60000);
                     await this.fetchLogData();
                     await this.fetchStaffData();
-                    
                     window.db.channel('realtime-management')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'log_absensi' }, () => this.fetchLogData())
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'data_staff' }, () => this.fetchStaffData())
@@ -299,41 +290,22 @@
                 updateShiftSekarang() {
                     const sekarang = new Date();
                     const totalMenit = (sekarang.getHours() * 60) + sekarang.getMinutes();
-                    if (totalMenit >= 390 && totalMenit < 1110) {
-                        this.shiftSekarang = "☀️ Pagi";
-                    } else {
-                        this.shiftSekarang = "🌙 Malam";
-                    }
+                    this.shiftSekarang = (totalMenit >= 390 && totalMenit < 1110) ? "☀️ Pagi" : "🌙 Malam";
                 },
 
                 async fetchLogData() {
                     let q = window.db.from('log_absensi').select('*').order('id', { ascending: false });
                     if (this.filterStatus !== 'Semua') q = q.eq('status', this.filterStatus);
                     if (this.pencarianNama.trim() !== '') q = q.ilike('nama_karyawan', `%${this.pencarianNama}%`);
-                    
                     if (this.filterTanggal) {
-                        let startISO, endISO;
-                        if (this.aktifShiftPreset === 'Pagi') {
-                            startISO = `${this.filterTanggal}T06:30:00`;
-                            endISO = `${this.filterTanggal}T18:30:00`;
-                        } else if (this.aktifShiftPreset === 'Malam') {
-                            startISO = `${this.filterTanggal}T18:30:00`;
-                            let tglEsok = new Date(this.filterTanggal);
-                            tglEsok.setDate(tglEsok.getDate() + 1);
-                            startISO = `${this.filterTanggal}T18:30:00`;
-                            endISO = `${tglEsok.toISOString().split('T')[0]}T06:30:00`;
-                        } else {
-                            startISO = `${this.filterTanggal}T00:00:00`;
-                            endISO = `${this.filterTanggal}T23:59:59`;
-                        }
-                        q = q.gte('waktu_keluar', startISO).lte('waktu_keluar', endISO);
+                        q = q.gte('waktu_keluar', `${this.filterTanggal}T00:00:00`).lte('waktu_keluar', `${this.filterTanggal}T23:59:59`);
                     }
                     const { data } = await q;
                     if (data) { this.logs = data; this.hitungMetrics(); }
                 },
 
                 setPresetShift(shift) {
-                    if (!this.filterTanggal) this.filterTanggal = new Date().toISOString().split('T')[0];
+                    this.filterTanggal = new Date().toISOString().split('T')[0];
                     this.aktifShiftPreset = shift;
                     this.fetchLogData();
                 },
@@ -344,25 +316,10 @@
                     if (data) this.staffList = data;
                 },
                 staffTerfilter() {
-                    if (this.filterShift === 'Semua') return this.staffList;
-                    return this.staffList.filter(s => s.shift === this.filterShift);
+                    return this.filterShift === 'Semua' ? this.staffList : this.staffList.filter(s => s.shift === this.filterShift);
                 },
                 lihatRincianStaff(nama) { this.pencarianNama = nama; this.menuAktif = 'dashboard'; this.fetchLogData(); },
                 resetFilterDanBukaDashboard() { this.pencarianNama = ''; this.filterStatus = 'Semua'; this.filterTanggal = ''; this.aktifShiftPreset = ''; this.menuAktif = 'dashboard'; this.fetchLogData(); },
-
-                downloadExcel() {
-                    if(this.logs.length === 0) return alert('Tidak ada data log!');
-                    let csvContent = "Tanggal Keluar;Nama Staff;Alasan;Status;Durasi (Menit);Jam Keluar;Jam Masuk\n";
-                    this.logs.forEach(log => {
-                        csvContent += `${this.formatTanggal(log.waktu_keluar)};${log.nama_karyawan};${log.alasan};${log.status};${log.durasi || 0};${this.formatJam(log.waktu_keluar)};${log.waktu_masuk ? this.formatJam(log.waktu_masuk) : "-"}\n`;
-                    });
-                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.setAttribute("href", url);
-                    link.setAttribute("download", `Log_Staff_${this.filterTanggal || 'Semua'}.csv`);
-                    link.click();
-                },
 
                 async tambahLog() {
                     if(!this.formLog.nama) return;
@@ -374,30 +331,33 @@
                     this.formStaff.nama = ''; this.bukaModalStaff = false;
                 },
                 async hapusStaff(id, nama) {
-                    if (!confirm(`Hapus staff "${nama}"?`) || prompt("Masukkan PIN:") !== this.pinAkses) return;
-                    await window.db.from('data_staff').delete().eq('id', id);
+                    if (confirm(`Hapus staff "${nama}"?`) && prompt("Masukkan PIN:") === this.pinAkses) {
+                        await window.db.from('data_staff').delete().eq('id', id);
+                    }
                 },
                 async checkIn(id, waktuKeluar) {
                     const waktuMasuk = new Date();
                     const durasi = Math.round((waktuMasuk - new Date(waktuKeluar)) / 60000);
                     await window.db.from('log_absensi').update({ waktu_masuk: waktuMasuk.toISOString(), status: 'Sudah Kembali', durasi: durasi }).eq('id', id);
                 },
-
-                // LOGIKA HITUNG METRICS TOTAL DAN RATA-RATA DURASI
                 hitungMetrics() {
                     this.metrics.total = this.logs.length;
                     this.metrics.kembali = this.logs.filter(l => l.status === 'Sudah Kembali').length;
                     this.metrics.keluar = this.logs.filter(l => l.status === 'Sedang Keluar').length;
-                    
                     const kembali = this.logs.filter(l => l.status === 'Sudah Kembali');
-                    // Hitung total akumulasi menit
                     this.metrics.totalDurasi = kembali.reduce((s, l) => s + (l.durasi || 0), 0);
-                    // Hitung rata-rata
                     this.metrics.rataDurasi = kembali.length ? Math.round(this.metrics.totalDurasi / kembali.length) : 0;
                 },
 
-                formatTanggal(iso) { return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); },
-                formatJam(iso) { return new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); }
+                // PERBAIKAN WAKTU: Tambah 7 Jam (WIB)
+                formatTanggal(iso) { 
+                    const date = new Date(new Date(iso).getTime() + (7 * 60 * 60 * 1000));
+                    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); 
+                },
+                formatJam(iso) { 
+                    const date = new Date(new Date(iso).getTime() + (7 * 60 * 60 * 1000));
+                    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); 
+                }
             }
         }
     </script>
